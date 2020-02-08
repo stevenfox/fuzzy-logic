@@ -16,4 +16,4 @@ operator_i : and,
 second_var_i : journey,
 second_val_i : short,
 result_var_i : tip,
-result_val_1 : big
+result_val_i : big
