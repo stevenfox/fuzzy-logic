@@ -1,0 +1,4 @@
+Rule 1: If driving is good and journey is short then tip is big.
+Rule 2: If driving is good or journey is short then tip is moderate.
+Rule 3: If driving is average and journey is medium then tip is moderate.
+Rule 4: If driving is bad and journey is long then tip is small.
