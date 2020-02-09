@@ -174,9 +174,10 @@ def membership_set_parser():
 
 
 def main():
-    rule_set_parser()
-    # print('fuzzy      ', fuzzy_set_parser())
-    fuzzy_set_parser()
+    rules_set = rule_set_parser()
+
+    # print('rules      ', rules_set['first_val_1'])
+
     x1 = Fuzzy_set()
 
     # print(x1.add(fuzzy_set_parser()))
