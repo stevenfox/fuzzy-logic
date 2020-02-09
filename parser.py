@@ -79,23 +79,24 @@ class Fuzzy_set:
                 self.title_dict.append(dic[key])
         return self.title_dict
 
-    def get_tuples(self, dic, title):
+    def get_tuples(self, dic, title, tuples_range=3):
         self.tuple_dict = []
-
         count = 0
+
         for key in dic:
             # print()
-            cnt = 3
             count += 1
             if 'Title_' in key:
                 list_tuple = list(dic.values())
                 tuple_title = ' '.join(map(str, dic[key]))
 
                 if(str(tuple_title) in title):
-                    for j in range(cnt):
+                    for j in range(tuples_range):
                         self.tuple_dict.append(list_tuple[count+j])
-                else:
-                    print('No tupple tile found')
+
+        if(not bool(self.tuple_dict)):
+            print('No tupple title found')
+
         return self.tuple_dict
 
 
@@ -110,43 +111,25 @@ def fuzzy_set_parser():
         sys.exit()
 
     lines = open(file_fuzzy_set).readlines()
-
     counter = 0
+
     for l in lines:
         val = l.split()
         fuzzy_dict[counter] = val
         counter += 1
 
-    # print(fuzzy_dict)
-
-    _dic_indx = 1
     _tupple_indx = 1
-
     fuzzy_set_dict = {}
 
     for i in fuzzy_dict:
-        # print('fuzzy? :) ', _dic_indx, ' ', fuzzy_dict[i])
         if(len(fuzzy_dict[i]) > 1):
             fuzzy_set_dict.update(
                 {'Tuple_'+str(_tupple_indx): fuzzy_dict[i]})
-
-            fuzzy_4_tuple = fuzzy_dict[i][1]+fuzzy_dict[i][2] + \
-                fuzzy_dict[i][3]+fuzzy_dict[i][4]
-
-            f_set.add(fuzzy_4_tuple)
-            # print('fuzzyy Class : ', Tupple.low)
             _tupple_indx += 1
         elif (len(fuzzy_dict[i]) == 1):
             fuzzy_set_dict.update(
                 {'Title_'+str(_tupple_indx): fuzzy_dict[i]})
             _tupple_indx += 1
-            # print('\nTitles: ', fuzzy_dict[i])
-
-        _dic_indx += 1
-        # print(f_set.get())
-
-    # print(fuzzy_set_dict['Tuple_6'][0], fuzzy_set_dict['Tuple_6'][1], fuzzy_set_dict['Tuple_6'][2], fuzzy_set_dict['Tuple_6']
-    #       [3], fuzzy_set_dict['Tuple_6'][4])
 
     return fuzzy_set_dict
 
@@ -159,10 +142,18 @@ def main():
 
     # print(x1.add(fuzzy_set_parser()))
     titles = x1.get_titles(fuzzy_set_parser())
-    tupleDriving = x1.get_tuples(fuzzy_set_parser(), 'DrivingQuality')
 
-    # print(titles)
-    print(tupleDriving)
+    tuple_journery = x1.get_tuples(
+        fuzzy_set_parser(), 'JourneyLength')
+    tuple_driving = x1.get_tuples(
+        fuzzy_set_parser(), 'DrivingQuality')
+    tuple_tip = x1.get_tuples(
+        fuzzy_set_parser(), 'SizeOfTip')
+
+    print(titles)
+    print(tuple_journery)
+    print(tuple_driving)
+    print(tuple_tip)
 
 
 if __name__ == '__main__':
