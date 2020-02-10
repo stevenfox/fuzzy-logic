@@ -2,9 +2,16 @@ import sys
 import os
 
 
-file_rules = 'files/RuleSet.txt'
-file_fuzzy_set = 'files/RuleSet.txt'
-file_membership = 'files/RuleSet.txt'
+file_set = 'files/RuleSet.txt'
+
+
+def readFile():
+    _filepath = file_set
+    if not os.path.isfile(_filepath):
+        print("File path {} does not exist. Exiting...".format(_filepath))
+        sys.exit()
+    _lines = open(file_set).readlines()
+    return _lines
 
 
 def search(values, searchFor, list_index):
@@ -17,20 +24,12 @@ def search(values, searchFor, list_index):
 
 
 def rule_set_parser():
-    _filepath = file_rules
+    _lines = readFile()
     rule_dict = {}
-    if not os.path.isfile(_filepath):
-        print("File path {} does not exist. Exiting...".format(_filepath))
-        sys.exit()
 
-    lines = open(file_rules).readlines()
-
-    for l in lines:
-        # (key, val) = l.strip().split(':')
-        # rule_dict[key] = val
-        # (key, val) = l.strip().split(':')
-        # rule_dict[key] = val
+    for l in _lines:
         rule_dict[l] = l
+
     _dic_indx = 1
     if_word = 'If'
 
@@ -52,10 +51,10 @@ def rule_set_parser():
                 {'result_var_'+str(_dic_indx): search(rule_dict[i], if_word, 11)})
             rule_set_dict.update(
                 {'result_val_'+str(_dic_indx): search(rule_dict[i], if_word, 13)})
+            _dic_indx += 1
 
-        else:
+        elif (_dic_indx < 2):
             print("No Rules found")
-        _dic_indx += 1
 
     # print("set\n", rule_set_dict)
 
@@ -108,27 +107,21 @@ class Fuzzy_set:
         print(self.tuple_int)
         return self.tuple_int
 
-    def max_tuple(self, dic):
-        self.max = max(sorted(dic, key=lambda x: x[1], reverse=True)[0])
-        # print(max(sorted(dic, key=lambda x: x[1], reverse=True))[:])
-        # print(max(sorted(dic, key=lambda x: x[1], reverse=True)[0]))
-        return self.max
+    def max_tuple(self, dic, i):
+        return int(dic[i][2]) + int(dic[i][4])
+
+    def min_tuple(self, dic, i):
+        return int(dic[i][1]) - int(dic[i][3])
 
 
 def fuzzy_set_parser():
 
-    _filepath = file_fuzzy_set
+    _lines = readFile()
     fuzzy_dict = {}
     f_set = Fuzzy_set()
-
-    if not os.path.isfile(_filepath):
-        print("File path {} does not exist. Exiting...".format(_filepath))
-        sys.exit()
-
-    lines = open(file_fuzzy_set).readlines()
     counter = 0
 
-    for l in lines:
+    for l in _lines:
         val = l.split()
         fuzzy_dict[counter] = val
         counter += 1
@@ -151,83 +144,52 @@ def fuzzy_set_parser():
 
 def membership_set_parser():
 
-    _filepath = file_membership
+    _lines = readFile()
     membership_dict = {}
-    # f_set = Fuzzy_set()
-
-    if not os.path.isfile(_filepath):
-        print("File path {} does not exist. Exiting...".format(_filepath))
-        sys.exit()
-
-    lines = open(file_membership).readlines()
     counter = 0
-
     membership_set_dict = []
-    for l in lines:
-
+    for l in _lines:
         if '=' in l:
-            # print('GOTSA ', l)
-            # print('>>>?', lines)
             str_l = l.replace('=', '')
             val = str_l.split()
-            # membership_set_dict.append(l)
-            # print('val ', val)
-            # membership_set_dict.remove
             membership_dict[counter] = val
             counter += 1
-            # print('mem? ', membership_dict)
-
-    _tupple_indx = 1
-
-    # for i in membership_dict:
-    #     if(len(membership_dict[i]) > 1):
-    #         membership_set_dict.update(
-    #             {'membership_name_'+str(_tupple_indx): membership_dict[i]})
-    #         _tupple_indx += 1
-    #     elif (len(membership_dict[i]) == 1):
-    #         membership_set_dict.update(
-    #             {'membership_value_'+str(_tupple_indx): membership_dict[i]})
-    #         _tupple_indx += 1
-
-    # print('?? :O', membership_set_dict)
-    # print('?? :O', membership_set_dict)
 
     return membership_dict
 
 
 def main():
-    # rules_set = rule_set_parser()
-
+    #  rules
+    rules_set = rule_set_parser()
     # print('rules      ', rules_set)
 
-    x1 = Fuzzy_set()
+#  fuzzy set
+    fuzzy_s = Fuzzy_set()
 
-    # print(x1.add(fuzzy_set_parser()))
-    titles = x1.get_titles(fuzzy_set_parser())
+    # print(fuzzy_s.add(fuzzy_set_parser()))
 
-    # tuple_journery = x1.get_tuples(
-    #     fuzzy_set_parser(), 'journey_time')
-    # tuple_driving = x1.get_tuples(
-    #     fuzzy_set_parser(), 'driving')
-    # tuple_tip = x1.get_tuples(
-    #     fuzzy_set_parser(), 'tip')
+    titles = fuzzy_s.get_titles(fuzzy_set_parser())
 
-    # print(titles)
-    # print(tuple_driving)
+    tuple_driving = fuzzy_s.get_tuples(
+        fuzzy_set_parser(), 'driving')
+    tuple_journery = fuzzy_s.get_tuples(
+        fuzzy_set_parser(), 'journey_time')
+    tuple_tip = fuzzy_s.get_tuples(
+        fuzzy_set_parser(), 'tip')
+
+    # print(titles[1][0])
+    print('individual values ', tuple_driving[1][3])
     # print(tuple_journery)
     # print(tuple_tip)
 
-    # membership = x1.get_titles(
-    #     membership_set_parser(),  'membership_')
+    print(fuzzy_s.max_tuple(tuple_driving, 1))
 
+# ---- membership
+    membership = membership_set_parser()
+    print('membership: ', membership[0][0],
+          '| value:', int(membership[0][1]))
     # journey_length = membership[0][1]
     # driving_quality = membership[1][1]
-
-    # print('???', membership_set_parser())
-    membership = membership_set_parser()
-
-    print('>>? ', membership[0][0])
-    # print('journey_length ', membership[1][1])
 
 
 if __name__ == '__main__':
