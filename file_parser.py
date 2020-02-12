@@ -1,6 +1,6 @@
 import sys
 import os
-
+import numpy as np
 
 file_set = 'files/RuleSet.txt'
 
@@ -83,6 +83,7 @@ class Fuzzy_set:
         self.tuple_dict = []
         count = 0
 
+        print('num . ', tuples_range)
         for key in dic:
             # print(dic)
             count += 1
@@ -107,11 +108,224 @@ class Fuzzy_set:
         print(self.tuple_int)
         return self.tuple_int
 
-    def max_tuple(self, dic, i):
+    def get_beta(self, dic, i):
         return int(dic[i][2]) + int(dic[i][4])
 
-    def min_tuple(self, dic, i):
+    def get_alpha(self, dic, i):
         return int(dic[i][1]) - int(dic[i][3])
+
+    def membership_calc(self, dic, val):
+        self.membership_values = []
+        _cnt = 1
+
+        # for s in range(len(dic)):
+        #     print(self.get_alpha(dic, s))
+        #     print(self.get_beta(dic, s))
+
+        # print('len ', len(dic))
+        # print('i> > >', (dic[0][2]))
+
+        # maxList = max(dic, key=len)
+        maxLength = max(map(len, dic))
+        # print('>? j', maxLength)
+        _counter = 0
+
+        self.tuple = []
+        # for s in range((maxLength)):
+        #     self.tuple.append(dic[0][s])
+
+        # print('TAPOLL', self.tuple)
+        _pre_beta = 1
+        _pre_alfa = self.get_alpha(dic, 0)
+        _beta_meta = self.get_beta(dic, 1)
+        _alpha_meta = self.get_alpha(dic, 1)
+
+        print('membership: ', val)
+        print('tuple: ', dic)
+
+        for s in range(len(dic)):
+            print('\n - - - -Tuple ', s)
+            # print(self.get_alpha(dic, s))
+            # print(self.get_beta(dic, s))
+            _a = int(dic[s][1])
+            _b = int(dic[s][2])
+            _a1 = int(dic[s][3])
+            _b1 = int(dic[s][4])
+            _alpha = self.get_alpha(dic, s)
+            _beta = self.get_beta(dic, s)
+            # print('> _ A: ', _alpha, _a)
+            # print('> _ B: ', _b, _beta)
+
+            if(val < _alpha or val > _beta):
+                print('0')
+            # if(val < _alpha):
+            #     print('0')
+            if(_a <= val and val <= _b):
+                print('1')
+            if(val <= _a):
+                # if(_a1 != _alpha):
+                if(_alpha < val and val < _a):
+                    print('a', _a)
+                    print('  ', (val - _a + _a1) / (float(_a1)))
+                # if(_b != _b):
+
+            if(val >= _b):
+                if(_b1 != _beta):
+                    if(_b1 < val and val < _beta):
+                        print('b', _b)
+                        print(' ', (_b + _b1 - val) / float(_b1))
+
+            # if(s > 0):
+            #     _pre_beta = self.get_beta(dic, s-1)
+            #     _pre_alfa = self.get_alpha(dic, s-1)
+
+            #     if(s < len(dic)-1):
+            #         _alpha_meta = self.get_alpha(dic, s+1)
+            #         _beta_meta = self.get_beta(dic, s+1)
+            #         # print('beta_meta: ', _beta_meta)
+            #         # _alpha_meta = 1000
+
+            # assert _alpha < _beta and _beta <= _beta_meta and _alpha_meta <= _beta_meta, '_alpha <= _beta <= _alpha_meta <= d is required.'
+            # _cnt = s-1
+
+        #    ------
+
+            # print('pre_alfa', _pre_alfa, 'pre_beta', _pre_beta)
+            # if((val <= _alpha) or (val <= _beta)):
+            #     # print(_alpha, _beta)
+            #     if(val > _alpha and val < _beta):
+            #         print('1')
+            #     if((val <= _beta) and (val > _alpha) and (val > _pre_beta) and(_alpha_meta <= val)):
+            #         print('val in beta: ', val, '|', _beta)
+            #     # break
+            #     if (val >= _alpha and (_alpha < _beta) and (_alpha < _pre_beta) and
+            #             (val <= _pre_beta) or ((_pre_alfa < val)) and (_alpha_meta >= val)):
+            #         print('val in alpha: ', val, '|', _alpha)
+            #         # break
+            #     # elif (val < _alpha & val < _beta):
+            #     #     print('One')
+            # else:
+            #     print('Zero')
+
+            # _cnt += 1
+            # _cnt = 1
+            # for _ in range(maxLength-1):
+            # print('>', dic[_counter][_cnt])
+            # print('val | dic', val, dic[_counter][_cnt])
+
+            # if(val < int(dic[_counter][_cnt])):
+            # print('val | dic', val, dic[_counter][_cnt])
+            # _cnt += 1
+            # _counter += 1
+        # print(_cnt, _counter)
+
+        # if(dic)
+        # min_tuple
+        # print('dict ', dic[i][1])
+
+
+def trap_membership_calc(mem_val, dic, _pos=0):
+    """
+    Trapezoidal membership function generator.
+    Parameters
+    ----------
+    x : 1d array
+        Independent variable.
+    abcd : 1d array, length 4
+        Four-element vector.  Ensure a <= b <= c <= d.
+    Returns
+    -------
+    y : 1d array
+        Trapezoidal membership function.
+    """
+
+    _fs = Fuzzy_set()
+    maxLength = max(map(len, dic))
+
+    tuple_values = []
+    val_list = []
+
+    # abcd = [30, 50, 50, 70]
+
+    for s in range((maxLength)):
+        tuple_values.append(dic[_pos][s])
+
+    # print('> ', tuple_values)
+    # print('abdcd', abcd[0][1])
+    # for i in dic:
+    # print('i    >  ', i)
+    # # abcd.append(i[0])
+    # print('abscs > ', abcd)
+
+    abcd = [_fs.get_alpha(dic, _pos), int(tuple_values[1]),
+            int(tuple_values[2]), _fs.get_beta(dic, _pos)]
+    print('abcd >> > ', abcd)
+    assert len(abcd) == 4, 'abcd parameter must have exactly four elements.'
+    _alpha, _a, _b, _beta = np.r_[abcd]
+    a_x = [mem_val]
+    x = np.array(a_x)
+    # print('??', _alpha, _a, _b, _beta)
+    assert _alpha <= _a and _a <= _b and _b <= _beta, 'abcd requires the four elements \
+                                          _alpha <= _a <= _b <= _beta.'
+    y = np.ones(len(x))
+
+    idx = np.nonzero(x <= _a)[0]
+    y[idx] = trimf(x[idx], np.r_[_alpha, _a, _a], tuple_values, mem_val)
+
+    idx = np.nonzero(x >= _b)[0]
+    print('_ <', idx)
+    y[idx] = trimf(x[idx], np.r_[_b, _b, _beta], tuple_values, mem_val)
+
+    idx = np.nonzero(x < _alpha)[0]
+    y[idx] = np.zeros(len(idx))
+
+    idx = np.nonzero(x > _beta)[0]
+    y[idx] = np.zeros(len(idx))
+
+    return y
+
+
+def trimf(x, abc, _list, _mem_val):
+    """
+    Triangular membership function generator.
+    Parameters
+    ----------
+    x : 1d array
+        Independent variable.
+    abc : 1d array, length 3
+        Three-element vector controlling shape of triangular function.
+        Requires a <= b <= c.
+    Returns
+    -------
+    y : 1d array
+        Triangular membership function.
+    """
+    assert len(abc) == 3, 'abc parameter must have exactly three elements.'
+    a, b, c = np.r_[abc]     # Zero-indexing in Python
+    assert a <= b and b <= c, 'abc requires the three elements a <= b <= c.'
+    _ba = 9
+    y = np.zeros(len(x))
+
+    # print('abc : ,', abc)
+    # Left side
+    if a != b:
+        idx = np.nonzero(np.logical_and(a < x, x < b))[0]
+        y[idx] = (x[idx] - a) / float(b - a)
+        # y[idx] = (x[idx] - a + b) / float(b)
+        print('in a: ', (_mem_val -
+                         int(_list[1]) + int(_list[3])) / (float(_list[3])))
+
+    # Right side
+    if b != c:
+        idx = np.nonzero(np.logical_and(b < x, x < c))[0]
+        y[idx] = (c - x[idx]) / float(c - b)
+        # y[idx] = (b + c - x[idx]) / float(c)
+        print('> > > in b:',
+              (int(_list[2]) + int(_list[4]) - _mem_val) / float(_list[4]))
+
+    idx = np.nonzero(x == b)
+    y[idx] = 1
+    return y
 
 
 def fuzzy_set_parser():
@@ -160,10 +374,10 @@ def membership_set_parser():
 
 def main():
     #  rules
-    rules_set = rule_set_parser()
-    # print('rules      ', rules_set)
+    # rules_set = rule_set_parser()
+    # print('rules      ', rules_set['operator_2'])
 
-#  fuzzy set
+    #  fuzzy set
     fuzzy_s = Fuzzy_set()
 
     # print(fuzzy_s.add(fuzzy_set_parser()))
@@ -174,22 +388,35 @@ def main():
         fuzzy_set_parser(), 'driving')
     tuple_journery = fuzzy_s.get_tuples(
         fuzzy_set_parser(), 'journey_time')
+    tuple_resp = fuzzy_s.get_tuples(
+        fuzzy_set_parser(), 'rerspiration_rate')
     tuple_tip = fuzzy_s.get_tuples(
         fuzzy_set_parser(), 'tip')
 
     # print(titles[1][0])
-    print('individual values ', tuple_driving[1][3])
+    # print('individual values ', tuple_driving[2][1])
     # print(tuple_journery)
     # print(tuple_tip)
 
-    print(fuzzy_s.max_tuple(tuple_driving, 1))
+    _a = tuple_driving[2][1]
+    _b = tuple_driving[2][2]
+    _c = tuple_driving[2][3]
+    _d = tuple_driving[2][4]
+    # print(fuzzy_s.get_beta(tuple_driving, 1))
 
 # ---- membership
     membership = membership_set_parser()
-    print('membership: ', membership[0][0],
-          '| value:', int(membership[0][1]))
+    # print('membership: ', membership[0][0],
+    #       '| value:', int(membership[0][1]))
     # journey_length = membership[0][1]
     # driving_quality = membership[1][1]
+
+    # print(fuzzy_s.membership_calc(tuple_driving, int(membership[1][1])))
+    print(fuzzy_s.membership_calc(tuple_journery, int(membership[0][1])))
+    # print(fuzzy_s.membership_calc(tuple_resp, int(membership[0][1])))
+
+    # print(trap_membership_calc(int(membership[1][1]), tuple_driving, 1))
+    # print(trap_membership_calc(int(membership[0][1]), tuple_journery, 1))
 
 
 if __name__ == '__main__':
