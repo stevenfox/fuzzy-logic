@@ -79,25 +79,30 @@ class Fuzzy_set:
                 self.title_dict.append(dic[key])
         return self.title_dict
 
-    def get_tuples(self, dic, title, keytitle='Title_', tuples_range=3):
+    def get_tuples(self, dic, title, keytitle='Title_'):
         self.tuple_dict = []
         count = 0
 
-        print('num . ', tuples_range)
         for key in dic:
-            # print(dic)
             count += 1
             if keytitle in key:
                 list_tuple = list(dic.values())
                 tuple_title = ' '.join(map(str, dic[key]))
 
                 if(str(tuple_title) in title):
-                    for j in range(tuples_range):
-                        self.tuple_dict.append(list_tuple[count+j])
+                    _cnt = 0
+                    for k in range(len(list_tuple[count])):
+                        if(len(list_tuple[count+k]) == 1):
+                            _cnt -= 1
+                        else:
+                            _cnt += 1
+                    for j in range(_cnt):
+                        if(len(list_tuple[count+j]) > 1):
+                            self.tuple_dict.append(list_tuple[count+j])
 
         if(not bool(self.tuple_dict)):
             print('No tupple title found')
-
+        # print(self.tuple_dict)
         return self.tuple_dict
 
     def get_numbers_tuple(self, dic, _cnt=3):
@@ -115,46 +120,18 @@ class Fuzzy_set:
         return int(dic[i][1]) - int(dic[i][3])
 
     def membership_calc(self, dic, val):
-        self.membership_values = []
-        _cnt = 1
+        self.membership_results = []
 
-        # for s in range(len(dic)):
-        #     print(self.get_alpha(dic, s))
-        #     print(self.get_beta(dic, s))
-
-        # print('len ', len(dic))
-        # print('i> > >', (dic[0][2]))
-
-        # maxList = max(dic, key=len)
-        maxLength = max(map(len, dic))
-        # print('>? j', maxLength)
-        _counter = 0
-
-        self.tuple = []
-        # for s in range((maxLength)):
-        #     self.tuple.append(dic[0][s])
-
-        # print('TAPOLL', self.tuple)
-        _pre_beta = 1
-        _pre_alfa = self.get_alpha(dic, 0)
-        _beta_meta = self.get_beta(dic, 1)
-        _alpha_meta = self.get_alpha(dic, 1)
-
-        print('membership: ', val)
-        print('tuple: ', dic)
-
+        # print('membership: ', val)
+        # print('tuple: ', dic)
         for s in range(len(dic)):
             print('\n - - - -Tuple ', s)
-            # print(self.get_alpha(dic, s))
-            # print(self.get_beta(dic, s))
             _a = int(dic[s][1])
             _b = int(dic[s][2])
             _a1 = int(dic[s][3])
             _b1 = int(dic[s][4])
             _alpha = self.get_alpha(dic, s)
             _beta = self.get_beta(dic, s)
-            # print('> _ A: ', _alpha, _a)
-            # print('> _ B: ', _b, _beta)
 
             if(val < _alpha or val > _beta):
                 print('0')
@@ -167,6 +144,8 @@ class Fuzzy_set:
                 if(_alpha < val and val < _a):
                     print('a', _a)
                     print('  ', (val - _a + _a1) / (float(_a1)))
+                    self.membership_results.append(
+                        (val - _a + _a1) / (float(_a1)))
                 # if(_b != _b):
 
             if(val >= _b):
@@ -174,54 +153,10 @@ class Fuzzy_set:
                     if(_b1 < val and val < _beta):
                         print('b', _b)
                         print(' ', (_b + _b1 - val) / float(_b1))
+                        self.membership_results.append(
+                            (_b + _b1 - val) / float(_b1))
 
-            # if(s > 0):
-            #     _pre_beta = self.get_beta(dic, s-1)
-            #     _pre_alfa = self.get_alpha(dic, s-1)
-
-            #     if(s < len(dic)-1):
-            #         _alpha_meta = self.get_alpha(dic, s+1)
-            #         _beta_meta = self.get_beta(dic, s+1)
-            #         # print('beta_meta: ', _beta_meta)
-            #         # _alpha_meta = 1000
-
-            # assert _alpha < _beta and _beta <= _beta_meta and _alpha_meta <= _beta_meta, '_alpha <= _beta <= _alpha_meta <= d is required.'
-            # _cnt = s-1
-
-        #    ------
-
-            # print('pre_alfa', _pre_alfa, 'pre_beta', _pre_beta)
-            # if((val <= _alpha) or (val <= _beta)):
-            #     # print(_alpha, _beta)
-            #     if(val > _alpha and val < _beta):
-            #         print('1')
-            #     if((val <= _beta) and (val > _alpha) and (val > _pre_beta) and(_alpha_meta <= val)):
-            #         print('val in beta: ', val, '|', _beta)
-            #     # break
-            #     if (val >= _alpha and (_alpha < _beta) and (_alpha < _pre_beta) and
-            #             (val <= _pre_beta) or ((_pre_alfa < val)) and (_alpha_meta >= val)):
-            #         print('val in alpha: ', val, '|', _alpha)
-            #         # break
-            #     # elif (val < _alpha & val < _beta):
-            #     #     print('One')
-            # else:
-            #     print('Zero')
-
-            # _cnt += 1
-            # _cnt = 1
-            # for _ in range(maxLength-1):
-            # print('>', dic[_counter][_cnt])
-            # print('val | dic', val, dic[_counter][_cnt])
-
-            # if(val < int(dic[_counter][_cnt])):
-            # print('val | dic', val, dic[_counter][_cnt])
-            # _cnt += 1
-            # _counter += 1
-        # print(_cnt, _counter)
-
-        # if(dic)
-        # min_tuple
-        # print('dict ', dic[i][1])
+        return self.membership_results
 
 
 def trap_membership_calc(mem_val, dic, _pos=0):
@@ -337,12 +272,13 @@ def fuzzy_set_parser():
 
     for l in _lines:
         val = l.split()
-        fuzzy_dict[counter] = val
-        counter += 1
+        if('Rule' not in val):
+            fuzzy_dict[counter] = val
+            counter += 1
+            # print('len', len(val), val)
 
     _tupple_indx = 1
     fuzzy_set_dict = {}
-
     for i in fuzzy_dict:
         if(len(fuzzy_dict[i]) > 1):
             fuzzy_set_dict.update(
@@ -352,7 +288,7 @@ def fuzzy_set_parser():
             fuzzy_set_dict.update(
                 {'Title_'+str(_tupple_indx): fuzzy_dict[i]})
             _tupple_indx += 1
-
+        # print(fuzzy_set_dict)
     return fuzzy_set_dict
 
 
@@ -396,12 +332,15 @@ def main():
     # print(titles[1][0])
     # print('individual values ', tuple_driving[2][1])
     # print(tuple_journery)
+    # print(tuple_driving)
+    # print(tuple_journery)
+
     # print(tuple_tip)
 
-    _a = tuple_driving[2][1]
-    _b = tuple_driving[2][2]
-    _c = tuple_driving[2][3]
-    _d = tuple_driving[2][4]
+    # _a = tuple_driving[2][1]
+    # _b = tuple_driving[2][2]
+    # _c = tuple_driving[2][3]
+    # _d = tuple_driving[2][4]
     # print(fuzzy_s.get_beta(tuple_driving, 1))
 
 # ---- membership
@@ -412,11 +351,14 @@ def main():
     # driving_quality = membership[1][1]
 
     # print(fuzzy_s.membership_calc(tuple_driving, int(membership[1][1])))
-    print(fuzzy_s.membership_calc(tuple_journery, int(membership[0][1])))
+    # print(fuzzy_s.membership_calc(tuple_journery, int(membership[0][1])))
+    _memres = fuzzy_s.membership_calc(tuple_journery, int(membership[0][1]))
     # print(fuzzy_s.membership_calc(tuple_resp, int(membership[0][1])))
 
     # print(trap_membership_calc(int(membership[1][1]), tuple_driving, 1))
     # print(trap_membership_calc(int(membership[0][1]), tuple_journery, 1))
+
+    print('mem results: ', _memres)
 
 
 if __name__ == '__main__':
