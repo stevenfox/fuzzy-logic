@@ -30,7 +30,7 @@ def rule_set_parser():
     for l in _lines:
         rule_dict[l] = l
 
-    _dic_indx = 1
+    _dic_indx = 0
     if_word = 'If'
 
     rule_set_dict = {}
@@ -51,15 +51,14 @@ def rule_set_parser():
                 {'result_var_'+str(_dic_indx): search(rule_dict[i], if_word, 11)})
             rule_set_dict.update(
                 {'result_val_'+str(_dic_indx): search(rule_dict[i], if_word, 13)})
-            _dic_indx += 1
             rule_set_dict.update(
-                {'num_of_rules': int(_dic_indx/2)})
+                {'num_of_rules': int(_dic_indx)})
             _dic_indx += 1
 
         # elif (_dic_indx < 2):
-            # print("No Rules found")
+        # print("No Rules found")
 
-            # print("set\n", rule_set_dict)
+        # print("set\n", rule_set_dict)
 
     return rule_set_dict
 
@@ -284,24 +283,25 @@ class Fuzzy_set:
         # print('rules      ',  memb_calc_set)
         # print(memb_calc_set[0][1][2])
         # print('rules      ', _mem_res)
-        _cnt = 0
+        _cnt = 1
 
         # for _item in _fparser.items():
 
-        # print(_item[1])
-        for key_, value_ in _rules_parser.items():
-            print('> key', key_, 'value', value_)
-            # print('> DS', i)
-            # if memb_calc_set[0][0][0] in _rules_parser[i] and memb_calc_set[0][0][1] in _rules_parser[i]:
-            #     if memb_calc_set[0][1][1] in _rules_parser[i] and memb_calc_set[0][1][2] in _rules_parser[i]:
-            #         if _fparser[1][0] in _rules_parser[i] and _fparser[0][2] in _rules_parser[i]:
-            #             if 'and' in _rules_parser[i]:
-            #                 print('and min()', memb_calc_set[0][1][0])
-            #             else:
-            #                 print('or max()', memb_calc_set[0][1][0])
-
-            _cnt = +1
-
+        # print(_titles[0])
+        # print(_rules_parser.keys())
+        for _indx in range((_rules_parser['num_of_rules'])+1):
+            # print('> key', _rules_parser['first_var_'+str(_cnt)])
+            print('> DS', memb_calc_set[0][2][1])
+            if memb_calc_set[1][0][0] in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[1][0][1] in _rules_parser['first_val_'+str(_indx)]:
+                if memb_calc_set[0][0][0] in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[0][2][1] in _rules_parser['second_val_'+str(_indx)]:
+                    if 'and' in _rules_parser['operator_'+str(_indx)]:
+                        print('and min()', memb_calc_set[1][0][0])
+                    else:
+                        print('or max()', memb_calc_set[0][0][0])
+                    for _title in _titles:
+                        # if _title[0] in _rules_parser['result_var_'+str(_indx)] and _fparser[0][2] in _rules_parser['result_val_'+str(_indx)]:
+                        if _title[0] in _rules_parser['result_var_'+str(_indx)]:
+                            print('true if ')
         return None
 
 
