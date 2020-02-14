@@ -61,6 +61,53 @@ def rule_set_parser():
     return rule_set_dict
 
 
+def fuzzy_set_parser():
+
+    _lines = readFile()
+    fuzzy_dict = {}
+    f_set = Fuzzy_set()
+    counter = 0
+
+    for l in _lines:
+        val = l.split()
+        if('Rule' not in val):
+            fuzzy_dict[counter] = val
+            counter += 1
+            # print('len', len(val), val)
+    _cnt = 0
+    fuzzy_set_dict = {}
+    _tupple_indx = 1
+    for i in fuzzy_dict:
+
+        if(len(fuzzy_dict[i]) > 1):
+            fuzzy_set_dict.update(
+                {'Tuple_'+str(_cnt)+'_'+str(_tupple_indx): fuzzy_dict[i]})
+            _tupple_indx += 1
+        elif (len(fuzzy_dict[i]) == 1):
+            fuzzy_set_dict.update(
+                {'Title_'+str(_cnt): fuzzy_dict[i]})
+            _tupple_indx = 1
+        # print(fuzzy_set_dict)
+            _cnt += 1
+    return fuzzy_set_dict
+
+
+def membership_set_parser():
+
+    _lines = readFile()
+    membership_dict = {}
+    counter = 0
+    membership_set_dict = []
+    for l in _lines:
+        if '=' in l:
+            str_l = l.replace('=', '')
+            val = str_l.split()
+            membership_dict[counter] = val
+            counter += 1
+
+    return membership_dict
+
+
 class Fuzzy_set:
 
     def __init__(self):
@@ -74,36 +121,87 @@ class Fuzzy_set:
 
     def get_titles(self, dic, keytitle='Title_'):
         self.title_dict = []
-        for key in dic:
-            if keytitle in key:
-                self.title_dict.append(dic[key])
+        for key_dic in dic:
+            if keytitle in key_dic:
+                self.title_dict.append(dic[key_dic])
         return self.title_dict
 
     def get_tuples(self, dic, title, keytitle='Title_'):
         self.tuple_dict = []
         count = 0
-
-        for key in dic:
+        _end_of_file = 0
+        # print('TITLE: ', title)
+        # print(dic)
+        for key_dic in dic:
             count += 1
-            if keytitle in key:
+            # print('=' in dic[key_dic], dic[key_dic])
+            # print('?', key_dic)
+            # if(title in dic[key_dic]):
+            #     print('title', title)
+            if('=' in dic[key_dic]):
+                _end_of_file = count
+                # print('end of file', _end_of_file, 'dic_len', len(
+                # dic.keys()), (int(len(dic.keys()) - _end_of_file)))
+                # print('True')
+            if keytitle in key_dic:
+                # print('>> ', keytitle)
                 list_tuple = list(dic.values())
-                tuple_title = ' '.join(map(str, dic[key]))
-
-                if(str(tuple_title) in title):
+                tuple_title = ' '.join(map(str, dic[key_dic]))
+                # print('< > ', tuple_title)
+                if(title in str(tuple_title)):
                     _cnt = 0
-                    for k in range(len(list_tuple[count])):
-                        if(len(list_tuple[count+k]) == 1):
-                            _cnt -= 1
-                        else:
-                            _cnt += 1
-                    for j in range(_cnt):
-                        if(len(list_tuple[count+j]) > 1):
-                            self.tuple_dict.append(list_tuple[count+j])
 
-        if(not bool(self.tuple_dict)):
-            print('No tupple title found')
+                    # print('ler', list_tuple)
+                    # for a in dic.keys():
+                    # if(key_dic > dic.keys):
+                    #     count
+                    # print('gooxo', a)
+                    _space_between_t = 0
+                    for m in range(len(list_tuple[count])):
+                        if(_end_of_file < count+m and '=' not in list_tuple[count+m]):
+                            # print('cnt', count+m)
+
+                            if((len(list_tuple[count+m])) == 1):
+                                _space_between_t += 1
+
+                            if _space_between_t < 1:
+                                # print('edw', list_tuple[count+m])
+                                # print(len(list_tuple[count+m]))
+                                # print('-- ', _space_between_t)
+
+                                self.tuple_dict.append(list_tuple[count+m])
+
+                            if(len(self.tuple_dict) < 1):
+                                print('No tupple title found')
+                                # print('(len(self.tuple_dict)',
+                                #   (len(self.tuple_dict)))
+
+                                # return None
         # print(self.tuple_dict)
         return self.tuple_dict
+        # print('edw', '=' in list_tuple[count+m])
+
+        #             if(len(list_tuple[count]) != 1):
+        #                 for k in range(len(list_tuple[count])):
+        #                     for l in list_tuple:
+        #                         if(_end_of_file != False):
+        #                             # print('list  ', k)
+
+        #                             # if ((k) < 3):
+        #                             # print('k ', k)
+
+        #                             # print('(len(list_tuple[count] ',
+        #                             #       (len(list_tuple[count+k])))
+        #                             print('> _ ) ', list_tuple[count+k])
+        #                 if(len(list_tuple[k]) == 1):
+        #                     _cnt -= 1
+        #                 else:
+        #                     _cnt += 1
+
+        #                 for j in range(_cnt):
+        #                     if(len(list_tuple[count+j]) > 1):
+        #                         self.tuple_dict.append(list_tuple[count+j])
+        #             # k = 0
 
     def get_numbers_tuple(self, dic, _cnt=3):
         # print(max(dic[0][1]))
@@ -157,6 +255,16 @@ class Fuzzy_set:
                             (_b + _b1 - val) / float(_b1))
 
         return self.membership_results
+
+    def fuzzification(self, membership_values):
+        rules_set = rule_set_parser()
+        # print('rules      ', rules_set)
+        print(self.membership_calc(membership_values[0][1]))
+        for i in rules_set:
+            # if membership_values[i] in rules_set[i]:
+            #     print(membership_values[i])
+
+            return
 
 
 def trap_membership_calc(mem_val, dic, _pos=0):
@@ -263,51 +371,6 @@ def trimf(x, abc, _list, _mem_val):
     return y
 
 
-def fuzzy_set_parser():
-
-    _lines = readFile()
-    fuzzy_dict = {}
-    f_set = Fuzzy_set()
-    counter = 0
-
-    for l in _lines:
-        val = l.split()
-        if('Rule' not in val):
-            fuzzy_dict[counter] = val
-            counter += 1
-            # print('len', len(val), val)
-
-    _tupple_indx = 1
-    fuzzy_set_dict = {}
-    for i in fuzzy_dict:
-        if(len(fuzzy_dict[i]) > 1):
-            fuzzy_set_dict.update(
-                {'Tuple_'+str(_tupple_indx): fuzzy_dict[i]})
-            _tupple_indx += 1
-        elif (len(fuzzy_dict[i]) == 1):
-            fuzzy_set_dict.update(
-                {'Title_'+str(_tupple_indx): fuzzy_dict[i]})
-            _tupple_indx += 1
-        # print(fuzzy_set_dict)
-    return fuzzy_set_dict
-
-
-def membership_set_parser():
-
-    _lines = readFile()
-    membership_dict = {}
-    counter = 0
-    membership_set_dict = []
-    for l in _lines:
-        if '=' in l:
-            str_l = l.replace('=', '')
-            val = str_l.split()
-            membership_dict[counter] = val
-            counter += 1
-
-    return membership_dict
-
-
 def main():
     #  rules
     # rules_set = rule_set_parser()
@@ -320,18 +383,21 @@ def main():
 
     titles = fuzzy_s.get_titles(fuzzy_set_parser())
 
-    tuple_driving = fuzzy_s.get_tuples(
-        fuzzy_set_parser(), 'driving')
+    # tuple_driving = fuzzy_s.get_tuples(
+    #     fuzzy_set_parser(), 'driving')
+
+    # print(fuzzy_set_parser())
     tuple_journery = fuzzy_s.get_tuples(
         fuzzy_set_parser(), 'journey_time')
-    tuple_resp = fuzzy_s.get_tuples(
-        fuzzy_set_parser(), 'rerspiration_rate')
-    tuple_tip = fuzzy_s.get_tuples(
-        fuzzy_set_parser(), 'tip')
+    # tuple_resp = fuzzy_s.get_tuples(
+    #     fuzzy_set_parser(), 'rerspiration_rate')
+    # tuple_tip = fuzzy_s.get_tuples(
+    #     fuzzy_set_parser(), 'tip')
 
     # print(titles[1][0])
     # print('individual values ', tuple_driving[2][1])
     # print(tuple_journery)
+    tuples = fuzzy_s.get_titles(fuzzy_set_parser())
     # print(tuple_driving)
     # print(tuple_journery)
 
@@ -352,13 +418,44 @@ def main():
 
     # print(fuzzy_s.membership_calc(tuple_driving, int(membership[1][1])))
     # print(fuzzy_s.membership_calc(tuple_journery, int(membership[0][1])))
-    _memres = fuzzy_s.membership_calc(tuple_journery, int(membership[0][1]))
+    # _memres = fuzzy_s.membership_calc(tuple_journery, int(membership[0][1]))
     # print(fuzzy_s.membership_calc(tuple_resp, int(membership[0][1])))
 
     # print(trap_membership_calc(int(membership[1][1]), tuple_driving, 1))
     # print(trap_membership_calc(int(membership[0][1]), tuple_journery, 1))
 
-    print('mem results: ', _memres)
+    # print('mem results: ', _memres)
+
+    # print('Return: ', fuzzy_s.fuzzification(membership))
+
+    # print(tuples[0][])
+    # print(tuples)
+
+    # print(str(tuples).lstrip('[').rstrip(']'))
+    # print(tuples[0])
+
+    tuples_set = fuzzy_s.get_tuples(fuzzy_set_parser(), 'tip')
+    testacle = []
+    for i in tuples:
+        if(i != (tuples[0])):
+            # print(i[0])
+            tuples_set = fuzzy_s.get_tuples(
+                fuzzy_set_parser(), i[0])
+            testacle.append(tuples_set)
+
+    for j in testacle:
+
+        # print(trap_membership_calc(int(membership[i][1]), j, 1))
+        # fuzzy_s.fuzzification()
+        print(fuzzy_s.membership_calc(j, int(membership[0][1])))
+
+        # print(j)
+
+        # # # print(i not in tuples[0], i, tuples[0])
+        # # # print(*tuples[i])
+    print(': P ', testacle[1][0][1])
+    # for j in tuples_set:
+    #     print(j)
 
 
 if __name__ == '__main__':
