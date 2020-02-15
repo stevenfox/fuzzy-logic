@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 from numpy.testing import assert_allclose, assert_raises
 
 
@@ -175,13 +176,13 @@ class Fuzzy_set:
 
                                 self.tuple_dict.append(list_tuple[count+m])
 
-                            if(len(self.tuple_dict) < 1):
-                                print('No tupple title found')
+                            # if(len(self.tuple_dict) < 1):
+                                # print('No tupple title found')
                                 # print('(len(self.tuple_dict)',
                                 #   (len(self.tuple_dict)))
 
                                 # return None
-        # print(self.tuple_dict)
+                                # print(self.tuple_dict)
         return self.tuple_dict
         # print('edw', '=' in list_tuple[count+m])
 
@@ -224,7 +225,7 @@ class Fuzzy_set:
     def membership_calc(self, dic, title, val):
         self.membership_results = {}
 
-        # print('membership: ', dic)
+        # print('membership: ', title)
         for s in range(len(dic)):
             # print('\n - - - -Tuple ', dic[s][0])
             # print('- - - -Tuple title ', dic)
@@ -242,7 +243,7 @@ class Fuzzy_set:
             # if(val < _alpha):
             #     print('0')
             if(_a <= val and val <= _b):
-                print('1')
+                # print('1')
                 self.membership_results.update({s: {'title': title, 'criteria': dic[s][0], 'result':
                                                     1, "given_value": val}})
             if(val <= _a):
@@ -276,63 +277,49 @@ class Fuzzy_set:
 
         memb_calc_set = {}
         for j in range(len(_mem_parser)):
+            # print(len(_mem_parser))
             # print('range(len(_mem_parser)', range(len(_mem_parser)))
-            for _title in _titles:
-                if(str(_title[0]) in _mem_parser[j][0]):
-                    _tuple = _fset.get_tuples(_fparser, _title[0])
-                    memb_calc_set.update({j: _fset.membership_calc(
-                        _tuple, _title[0], int(_mem_parser[j][1]))})
-
-                    # print('pray', _tuple, _title[0], _mem_parser[j][1])
-        # print('rules      ',  memb_calc_set)
-        # print(memb_calc_set)
-        # print('rules      ', _mem_res)
+            if(_mem_parser[j][0] in str(_titles)):
+                # print(_mem_parser[j][0])
+                # for _title in _titles:
+                #     print(_title)
+                #     if(str(_titles) in _mem_parser[j][0]):
+                _tuple = _fset.get_tuples(_fparser, _mem_parser[j][0])
+                memb_calc_set.update({j: _fset.membership_calc(
+                    _tuple, _mem_parser[j][0], int(_mem_parser[j][1]))})
+                # print(_mem_parser[j][0])
         _cnt = 1
-
-        # for _item in _fparser.items():
-
-        # print(_titles[0])
-        # print(_rules_parser.keys())
-        # for l in memb_calc_set:
-        #     print(memb_calc_set[l])
-        # _n = 1
+        # print(memb_calc_set)
         for _m in memb_calc_set:
-            # print("\nPerson ID:", p_id)
-            # print('> DS', memb_calc_set[1][0].get('criteria'))
             for _n in memb_calc_set[_m]:
-                # print('m', _m, 'n', _n)
                 for _indx in range((_rules_parser['num_of_rules'])+1):
-                    # print('> key', memb_calc_set[_m][_n].get('title') in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['first_val_'+str(
-                    #     _indx)] and memb_calc_set[_m][_n].get('title') in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['second_val_'+str(_indx)])
-                    # print('> DS', memb_calc_set)
                     if memb_calc_set[_m][_n].get('title') in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['first_val_'+str(_indx)]:
-                        # print('----->', memb_calc_set[_m][_n].get('title'),
-                        #       '--', memb_calc_set[_m][_n].get('criteria'))
                         _kn = 0
                         for _s in memb_calc_set:
                             _kn += 1
                             for _d in memb_calc_set[_s]:
-                                # print(
-                                #     ' > >', memb_calc_set[_d][_s].get('criteria'), 's', _s, 'd', _d)
                                 if memb_calc_set[_s][_d].get('title') in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[_s][_d].get('criteria') in _rules_parser['second_val_'+str(_indx)]:
+                                    # print(memb_calc_set[_m][_n].get('result'))
                                     # print('\t---->', memb_calc_set[_s][_d].get(
                                     #     'title'),  '--', memb_calc_set[_s][_d].get('criteria'))
                                     if 'and' in _rules_parser['operator_'+str(_indx)]:
+                                        # print(
+                                        #     memb_calc_set[_m][_n].get('result'))
 
                                         self.value_conclusion.update({_n: {'value': min(memb_calc_set[_m][_n].get(
-                                            'result'), memb_calc_set[_s][_d].get('result')), 'result_name': _rules_parser['result_var_'+str(_indx)], 'conclusion': _rules_parser['result_val_'+str(_indx)]}})
+                                            'result'), memb_calc_set[_m][_n].get('result')), 'result_name': _rules_parser['result_var_'+str(_indx)], 'conclusion': _rules_parser['result_val_'+str(_indx)]}})
                                         # print(
                                         #     'min', self.value_conclusion.items())
                                         conclusions_list.append([_rules_parser['result_var_'+str(_indx)], _rules_parser['result_val_'+str(_indx)], min(memb_calc_set[_m][_n].get(
-                                            'result'), memb_calc_set[_s][_d].get('result'))])
+                                            'result'), memb_calc_set[_m][_n].get('result'))])
 
                                     else:
                                         self.value_conclusion.update({_n: {'value': max(memb_calc_set[_m][_n].get(
-                                            'result'), memb_calc_set[_s][_d].get('result')), 'result_name': _rules_parser['result_var_'+str(_indx)], 'conclusion': _rules_parser['result_val_'+str(_indx)]}})
+                                            'result'), memb_calc_set[_m][_n].get('result')), 'result_name': _rules_parser['result_var_'+str(_indx)], 'conclusion': _rules_parser['result_val_'+str(_indx)]}})
                                         # print(
                                         #     'max', self.value_conclusion.items())
                                         conclusions_list.append([_rules_parser['result_var_'+str(_indx)], _rules_parser['result_val_'+str(_indx)], max(memb_calc_set[_m][_n].get(
-                                            'result'), memb_calc_set[_s][_d].get('result'))])
+                                            'result'), memb_calc_set[_m][_n].get('result'))])
                                     # for _title in _titles:
                                         # if _title[0] in _rules_parser['result_var_'+str(_indx)] and _fparser[0][2] in _rules_parser['result_val_'+str(_indx)]:
                                         # if _title[0] in _rules_parser['result_var_'+str(_indx)]:
@@ -340,7 +327,8 @@ class Fuzzy_set:
         # print(conclusions_list)
         # print(self.value_conclusion)
 
-        return self.value_conclusion
+        # return self.value_conclusion
+        return conclusions_list
 
     def defuzzification(self, val_conclusion, _area):
         """
@@ -411,25 +399,42 @@ class Fuzzy_set:
 
     def defuzzy(self, _conclusions):
 
-        # print('Godffuf', _conclusions[0].get('result_name'))
-        for conclusion in _conclusions:
-            # if(_conclusions.get('result_name') in self.get_tuples(fuzzy_set_parser(), _conclusions.get('result_name'))):
-            _current_tuple = self.get_tuples(
-                fuzzy_set_parser(), _conclusions[conclusion].get('result_name'))
-            # print(_current_tuple)
-            for _tuple_ in _current_tuple:
-                # print(' dAS >D', _tuple_[0])
-                if(_tuple_[0] in _conclusions[conclusion].get('conclusion')):
-                    _tuple_conclusion = _tuple_
-                    _a_b = (float(_tuple_[2]) + float(_tuple_[3]))
-                    _conclusion_value = _conclusions[conclusion].get('value')
-                    print('A and B ', _tuple_[2], _tuple_[3], '=', _a_b)
-                    print((0.5 * _conclusion_value * _a_b * _conclusion_value))
-                    _area = ((0.5 * (_a_b)) - (0.5 *
-                                               _conclusion_value * _a_b * _conclusion_value))
-                    # print(_tuple_conclusion[0])
-                    print("Area: ", _area, 'for', _conclusion_value,
-                          'and', _conclusions[conclusion].get('conclusion'))
+        _area_list = []
+        _area_centre_list = []
+        # convert list of list into list of tuple
+        tuple_line = [tuple(pt) for pt in _conclusions]
+        # remove duplicated element
+        tuple_new_line = sorted(set(tuple_line), key=tuple_line.index)
+        # convert list of tuple into list of list
+        _conclusions_list = [list(t) for t in tuple_new_line]
+
+        print(_conclusions_list)
+        for conclusion in range(len(_conclusions_list)):
+            if(_conclusions_list[conclusion][2] > 0):
+                # if(_conclusions_list[0][0] in self.get_tuples(fuzzy_set_parser(), _conclusions_list[0][0])):
+                _current_tuple = self.get_tuples(
+                    fuzzy_set_parser(), _conclusions_list[conclusion][0])
+                # print('>>', _current_tuple)
+                for _tuple_ in _current_tuple:
+                    # print(' dAS >D', _tuple_[0])
+                    # print('conc', _conclusions_list[conclusion][1])
+                    if(_tuple_[0] in _conclusions_list[conclusion][1]):
+                        _tuple_conclusion = _tuple_
+                        _a_b = (float(_tuple_[2]) + float(_tuple_[3]))
+                        _conclusion_value = _conclusions_list[conclusion][2]
+                        # print('A and B ', _tuple_[2], _tuple_[3], '=', _a_b)
+                        # print((0.5 * _conclusion_value * _a_b * _conclusion_value))
+                        _area = round(((0.5 * (_a_b)) - (0.5 *
+                                                         _conclusion_value * _a_b * _conclusion_value)))
+                        _area_list.append(_area)
+                        _area_centre = (float(_tuple_[2]) * _conclusion_value)
+                        _area_centre_list.append(_area_centre)
+                        # print(_tuple_conclusion[0])
+                        print("Area: ", _area, 'Area centre:', _area_centre, 'for', _conclusion_value,
+                              'and', _conclusions_list[conclusion][1])
+
+        print('Defuzzified value: ', np.sum(
+            _area_centre) / np.sum(_area_centre_list))
 
 
 def trap_membership_calc(mem_val, dic, _pos=0):
@@ -588,8 +593,8 @@ def main():
 
     titles = fuzzy_s.get_titles(fuzzy_set_parser())
 
-    # tuple_driving = fuzzy_s.get_tuples(
-    #     fuzzy_set_parser(), 'driving')
+    tuple_driving = fuzzy_s.get_tuples(
+        fuzzy_set_parser(), 'driving')
 
     # print(fuzzy_set_parser())
     tuple_journery = fuzzy_s.get_tuples(
@@ -615,16 +620,17 @@ def main():
     # print(fuzzy_s.get_beta(tuple_driving, 1))
 
 # ---- membership
-    membership = membership_set_parser()
+    # membership = membership_set_parser()
     # print('membership: ', membership[0][0],
     #       '| value:', int(membership[0][1]))
     # journey_length = membership[0][1]
     # driving_quality = membership[1][1]
 
-    # print(fuzzy_s.membership_calc(tuple_driving, int(membership[1][1])))
+    # print(fuzzy_s.membership_calc(
+    #     tuple_driving, 'driving', int(membership[1][1])))
     # print(fuzzy_s.membership_calc(tuple_journery, int(membership[0][1])))
-    _memres = fuzzy_s.membership_calc(
-        tuple_journery, 'journey_time', int(membership[0][1]))
+    # _memres = fuzzy_s.membership_calc(
+    #     tuple_journery, 'journey_time', int(membership[0][1]))
 
     # def helper_centroid(mean=0, sigma=1):
     #     fuzzy_s = Fuzzy_set()
