@@ -220,7 +220,7 @@ class Fuzzy_set:
         return int(dic[i][1]) - int(dic[i][3])
 
     def membership_calc(self, dic, title, val):
-        self.membership_results = []
+        self.membership_results = {}
 
         # print('membership: ', dic)
         for s in range(len(dic)):
@@ -235,21 +235,21 @@ class Fuzzy_set:
             _beta = self.get_beta(dic, s)
 
             if(val < _alpha or val > _beta):
-                self.membership_results.append([title, dic[s][0],
-                                                0])
+                self.membership_results.update({s: {'title': title, 'criteria': dic[s][0], 'result':
+                                                    0, "given_value": val}})
             # if(val < _alpha):
             #     print('0')
             if(_a <= val and val <= _b):
                 print('1')
-                self.membership_results.append([title, dic[s][0],
-                                                1])
+                self.membership_results.update({s: {'title': title, 'criteria': dic[s][0], 'result':
+                                                    1, "given_value": val}})
             if(val <= _a):
                 # if(_a1 != _alpha):
                 if(_alpha < val and val < _a):
                     # print('a', _a)
                     # print('  ', (val - _a + _a1) / (float(_a1)))
-                    self.membership_results.append([title, dic[s][0],
-                                                    (val - _a + _a1) / (float(_a1))])
+                    self.membership_results.update({s: {'title': title, 'criteria': dic[s][0], 'result':
+                                                        (val - _a + _a1) / float(_a1), "given_value": val}})
                 # if(_b != _b):
 
             if(val >= _b):
@@ -257,8 +257,8 @@ class Fuzzy_set:
                     if(_b1 < val and val < _beta):
                         # print('b', _b)
                         # print(' ', (_b + _b1 - val) / float(_b1))
-                        self.membership_results.append([title, dic[s][0],
-                                                        (_b + _b1 - val) / float(_b1)])
+                        self.membership_results.update({s: {'title': title, 'criteria': dic[s][0], 'result':
+                                                            (_b + _b1 - val) / float(_b1), "given_value": val}})
         # print(self.membership_results)
         return self.membership_results
 
@@ -270,18 +270,18 @@ class Fuzzy_set:
         _mem_parser = membership_set_parser()
         _titles = _fset.get_titles(_fparser)
 
-        memb_calc_set = []
+        memb_calc_set = {}
         for j in range(len(_mem_parser)):
             # print('range(len(_mem_parser)', range(len(_mem_parser)))
             for _title in _titles:
                 if(str(_title[0]) in _mem_parser[j][0]):
                     _tuple = _fset.get_tuples(_fparser, _title[0])
-                    memb_calc_set.append(_fset.membership_calc(
-                        _tuple, _title[0], int(_mem_parser[j][1])))
+                    memb_calc_set.update({j: _fset.membership_calc(
+                        _tuple, _title[0], int(_mem_parser[j][1]))})
 
                     # print('pray', _tuple, _title[0], _mem_parser[j][1])
         # print('rules      ',  memb_calc_set)
-        # print(memb_calc_set[0][1][2])
+        print(memb_calc_set)
         # print('rules      ', _mem_res)
         _cnt = 1
 
@@ -289,20 +289,61 @@ class Fuzzy_set:
 
         # print(_titles[0])
         # print(_rules_parser.keys())
-        for _indx in range((_rules_parser['num_of_rules'])+1):
-            # print('> key', _rules_parser['first_var_'+str(_cnt)])
-            print('> DS', memb_calc_set[0][2][1])
-            if memb_calc_set[1][0][0] in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[1][0][1] in _rules_parser['first_val_'+str(_indx)]:
-                if memb_calc_set[0][0][0] in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[0][2][1] in _rules_parser['second_val_'+str(_indx)]:
-                    if 'and' in _rules_parser['operator_'+str(_indx)]:
-                        print('and min()', memb_calc_set[1][0][0])
-                    else:
-                        print('or max()', memb_calc_set[0][0][0])
-                    for _title in _titles:
-                        # if _title[0] in _rules_parser['result_var_'+str(_indx)] and _fparser[0][2] in _rules_parser['result_val_'+str(_indx)]:
-                        if _title[0] in _rules_parser['result_var_'+str(_indx)]:
-                            print('true if ')
+        # for l in memb_calc_set:
+        #     print(memb_calc_set[l])
+        # _n = 1
+        for _m in memb_calc_set:
+            # print("\nPerson ID:", p_id)
+            # print('> DS', memb_calc_set[1][0].get('criteria'))
+            for _n in memb_calc_set[_m]:
+                # print('m', _m, 'n', _n)
+                for _indx in range((_rules_parser['num_of_rules'])+1):
+                    # print('> key', memb_calc_set[_m][_n].get('title') in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['first_val_'+str(
+                    #     _indx)] and memb_calc_set[_m][_n].get('title') in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['second_val_'+str(_indx)])
+                    # print('> DS', memb_calc_set)
+                    if memb_calc_set[_m][_n].get('title') in _rules_parser['first_var_'+str(_indx)] and memb_calc_set[_m][_n].get('criteria') in _rules_parser['first_val_'+str(_indx)]:
+                        print('----->', memb_calc_set[_m][_n].get('title'),
+                              '--', memb_calc_set[_m][_n].get('criteria'))
+
+                        for _s in memb_calc_set:
+                            for _d in memb_calc_set[_s]:
+                                # print(
+                                #     ' > >', memb_calc_set[_d][_s].get('criteria'), 's', _s, 'd', _d)
+                                if memb_calc_set[_s][_d].get('title') in _rules_parser['second_var_'+str(_indx)] and memb_calc_set[_s][_d].get('criteria') in _rules_parser['second_val_'+str(_indx)]:
+                                    print('\t---->', memb_calc_set[_s][_d].get(
+                                        'title'),  '--', memb_calc_set[_s][_d].get('criteria'))
+                                    if 'and' in _rules_parser['operator_'+str(_indx)]:
+
+                                        print('min of: ', memb_calc_set[_m][_n].get(
+                                            'result'), ' - ', memb_calc_set[_s][_d].get('result'))
+
+                                    else:
+                                        print('max of: ', memb_calc_set[_m][_n].get(
+                                            'result'), ' - ', memb_calc_set[_s][_d].get('result'))
+                                    # for _title in _titles:
+                                        # if _title[0] in _rules_parser['result_var_'+str(_indx)] and _fparser[0][2] in _rules_parser['result_val_'+str(_indx)]:
+                                        # if _title[0] in _rules_parser['result_var_'+str(_indx)]:
+                                        #     print('true if ')
+
         return None
+        # for _ascendant in range(len(memb_calc_set[0])):
+        #     if memb_calc_set[_ascendant][0][0] in _rules_parser['first_var_'+str(_indx)]:
+        #         for _ascendant_2 in range(len(memb_calc_set[0][:])):
+        #             if memb_calc_set[1][_ascendant_2][1] in _rules_parser['first_val_'+str(_indx)]:
+        #                 for _descendant in range(len(memb_calc_set[0])):
+        #                     if memb_calc_set[_descendant][0][0] in _rules_parser['second_var_'+str(_indx)]:
+        #                         for _descendant_2 in range(len(memb_calc_set[0])):
+        #                             if memb_calc_set[0][_descendant_2][1] in _rules_parser['second_val_'+str(_indx)]:
+        #                                 if 'and' in _rules_parser['operator_'+str(_indx)]:
+        #                                     print('and min()',
+        #                                           memb_calc_set[1][0][0])
+        #                                 else:
+        #                                     print('or max()',
+        #                                           memb_calc_set[0][0][0])
+        #                                 for _title in _titles:
+        #                                     # if _title[0] in _rules_parser['result_var_'+str(_indx)] and _fparser[0][2] in _rules_parser['result_val_'+str(_indx)]:
+        #                                     if _title[0] in _rules_parser['result_var_'+str(_indx)]:
+        #                                         print('true if ')
 
 
 def trap_membership_calc(mem_val, dic, _pos=0):
