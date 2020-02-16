@@ -15,18 +15,8 @@ fset = Fuzzy_set()
 
 # fuzzy_set_dic = fp.fuzzy_set_parser()
 
-
-f_titles = fset.get_titles(fp.fuzzy_set_parser())
-
-
-# print(f_titles[1])
-# print('>>>>>> ', fset.get_tuples(
-#     fp.fuzzy_set_parser(), 'DrivingQuality'))
-
-tuple_journ = fset.get_numbers_tuple(fset.get_tuples(
-    fp.fuzzy_set_parser(), 'JourneyLength'))
-
-print(tuple_journ)
+print('Initializing...')
+fp.runall()
 
 
 # tuple_max = fset.max_tuple(tuple_journ)
@@ -57,12 +47,6 @@ print(tuple_journ)
 
 # results = list(map(int, results))
 
-
-membership = fset.get_titles(
-    fp.membership_set_parser(),  'membership_')
-
-journey_length = membership[0][1]
-driving_quality = membership[1][1]
 
 # print(journey_length)
 
