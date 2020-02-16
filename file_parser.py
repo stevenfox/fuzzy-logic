@@ -469,15 +469,21 @@ def trimf(x, abc, _list, _mem_val):
 
 
 def runall():
+    print('Please wait...')
     fuzzy_ = Fuzzy_set()
     membership = membership_set_parser()
 
     fuzzy_.defuzzy(fuzzy_.fuzzification())
-    # print('You entered: ', max_n_tuple)
 
 
 def main():
-    runall()
+    print('\n')
+    print('–––––––––––––––––––––––––––––––-------------------–––––––––––----––––––––––––––––––––-–')
+    print('File parser and fuzzy logic for the given text file example.')
+    print('In order to run it, please run the fuzzy_logic file along with the required arguments')
+    print('e.g. $ python fuzzy_logic.py files/RuleSet_complex.txt 6 ')
+    print('–––––––––––––––––––––––––––––––-------------------–––––––––––----––––––––––––––––––––-–')
+    print('\n')
 
 
 def gaussmf(x, mean, sigma):
