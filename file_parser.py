@@ -328,47 +328,27 @@ class Fuzzy_set:
         # print(_conclusions_list)
         for conclusion in range(len(_conclusions_list)):
             if(_conclusions_list[conclusion][2] > 0):
-                # if(_conclusions_list[0][0] in self.get_tuples(fuzzy_set_parser(), _conclusions_list[0][0])):
                 _current_tuple = self.get_tuples(
                     fuzzy_set_parser(), _conclusions_list[conclusion][0])
-                # print('>>', _current_tuple)
                 for _tuple_ in _current_tuple:
-                    # print(' dAS >D', _tuple_[0])
-                    # print('conc', _conclusions_list[conclusion][1])
                     if(_tuple_[0] == _conclusions_list[conclusion][1]):
                         _tuple_conclusion = _tuple_
                         _a_b = (float(_tuple_[3]) + float(_tuple_[4]))
-                        # if _a_b == '0':
-                        #     _a_b = (float(_tuple_[2]) + float(_tuple_[3]))
-                        _conclusion_value = float(
-                            _conclusions_list[conclusion][2])
-                        print(_tuple_)
-                        # print('ALpha', self.get_alpha(_tuple_, _tuple_[1]))
-                        # print('Beta ', self.get_beta(_tuple_, _tuple_[1]))
-
                         _alpha = int(_tuple_[1]) - int(_tuple_[3])
                         _beta = int(_tuple_[2]) + int(_tuple_[4])
                         _upper_base = int(_tuple_[2]) - int(_tuple_[1])
-
                         _lower_base = _beta - _alpha
+
+                        _conclusion_value = float(
+                            _conclusions_list[conclusion][2])
 
                         print("ALPHA, ", _alpha)
                         print("BETA, ", _beta)
                         print('upper_base:', _upper_base)
                         print('lower_base:', _lower_base)
 
-                        # print('A and B ', _tuple_[2], _tuple_[3], '=', _a_b)
-                        # print((0.5 * _conclusion_value * _a_b * _conclusion_value))
-                        # print(_a_b, '*', _conclusion_value,
-                        #       '=', _a_b * _conclusion_value)
-
                         _area = round((0.5 * float(_conclusion_value) *
                                        (_lower_base+(_lower_base*(1-_conclusion_value)))), 3)
-                        #  area = round(((0.5 * (_upper_base+_lower_base)) - (0.5 *
-                        #  float(_conclusion_value) * (float(_a_b) * float(_conclusion_value)))), 3)
-
-                        # _area = round(((0.5 * (_a_b)) - (0.5 *
-                        #                                  float(_conclusion_value) * (float(_a_b) * float(_conclusion_value)))), 3)
 
                         if (int(_tuple_[1])) == (int(_tuple_[2])):
 
@@ -392,8 +372,8 @@ class Fuzzy_set:
                               'and', _conclusions_list[conclusion][1])
         print(
             '--------------------------------------------------------')
-        print('Defuzzified value: ', np.sum(
-            _area_centre_list) / np.sum(_area_list), 'AREA LIST: ', _area_centre_list, '<<')
+        print('Defuzzified value: ', round(np.sum(
+            _area_centre_list) / np.sum(_area_list), 5))
         print(
             '--------------------------------------------------------')
 
