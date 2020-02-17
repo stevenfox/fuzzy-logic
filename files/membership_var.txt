@@ -1,2 +1,0 @@
-Journey_length = 12
-Driving_quality = 45
