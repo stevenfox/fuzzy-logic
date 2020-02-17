@@ -342,16 +342,50 @@ class Fuzzy_set:
                         #     _a_b = (float(_tuple_[2]) + float(_tuple_[3]))
                         _conclusion_value = float(
                             _conclusions_list[conclusion][2])
+                        print(_tuple_)
+                        # print('ALpha', self.get_alpha(_tuple_, _tuple_[1]))
+                        # print('Beta ', self.get_beta(_tuple_, _tuple_[1]))
+
+                        _alpha = int(_tuple_[1]) - int(_tuple_[3])
+                        _beta = int(_tuple_[2]) + int(_tuple_[4])
+                        _upper_base = int(_tuple_[2]) - int(_tuple_[1])
+
+                        _lower_base = _beta - _alpha
+
+                        print("ALPHA, ", _alpha)
+                        print("BETA, ", _beta)
+                        print('upper_base:', _upper_base)
+                        print('lower_base:', _lower_base)
+
                         # print('A and B ', _tuple_[2], _tuple_[3], '=', _a_b)
                         # print((0.5 * _conclusion_value * _a_b * _conclusion_value))
                         # print(_a_b, '*', _conclusion_value,
                         #       '=', _a_b * _conclusion_value)
-                        _area = round(((0.5 * (_a_b)) - (0.5 *
-                                                         float(_conclusion_value) * (float(_a_b) * float(_conclusion_value)))), 3)
+
+                        _area = round((0.5 * float(_conclusion_value) *
+                                       (_lower_base+(_lower_base*(1-_conclusion_value)))), 3)
+                        #  area = round(((0.5 * (_upper_base+_lower_base)) - (0.5 *
+                        #  float(_conclusion_value) * (float(_a_b) * float(_conclusion_value)))), 3)
+
+                        # _area = round(((0.5 * (_a_b)) - (0.5 *
+                        #                                  float(_conclusion_value) * (float(_a_b) * float(_conclusion_value)))), 3)
+
+                        if (int(_tuple_[1])) == (int(_tuple_[2])):
+
+                            _mid_point = _alpha + (_lower_base/2)
+                            _centroid = int(
+                                _tuple_[1]) + ((_mid_point - int(_tuple_[1])) * 2 / 3)
+
+                        else:
+                            _centroid = (
+                                ((2 * _lower_base + _upper_base) / (3 * (_lower_base + _upper_base))*_conclusion_value))
+
                         _area_list.append(_area)
-                        _area_centre = (_area * _conclusion_value)
+                        _area_centre = (_area * _centroid)
                         _area_centre_list.append(_area_centre)
-                        # print(_tuple_conclusion[0])
+
+                        print('Centroid: ', _centroid)
+
                         print(
                             '--------------------------------------------------------')
                         print("Area: ", _area, 'Area centre:', _area_centre, 'for', _conclusion_value,
@@ -359,7 +393,7 @@ class Fuzzy_set:
         print(
             '--------------------------------------------------------')
         print('Defuzzified value: ', np.sum(
-            _area_centre) / np.sum(_area_centre_list))
+            _area_centre_list) / np.sum(_area_list), 'AREA LIST: ', _area_centre_list, '<<')
         print(
             '--------------------------------------------------------')
 
@@ -477,6 +511,7 @@ def runall():
 
 
 def main():
+    # runall()
     print('\n')
     print('–––––––––––––––––––––––––––––––-------------------–––––––––––----––––––––––––––––––––-–')
     print('File parser and fuzzy logic for the given text file example.')
