@@ -5,7 +5,7 @@ Rule 2: If HR is low and R is normal then D is moderate
 Rule 3: If HR is low and R is low then D is small
 Rule 4: If HR is very_low and R is low then D is very_small 
 Rule 5: If HR is high and R is high then D is large
-Rule 6: If HR is very_high and R is high then D is very_large.
+Rule 6: If HR is very_high and R is high then D is very_large
 
 HR
 very_low 40 40 0 20 
