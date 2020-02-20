@@ -6,7 +6,16 @@ from numpy.testing import assert_allclose, assert_raises
 
 
 file_set = sys.argv[1]
-max_n_tuple = sys.argv[2]
+try:
+    max_n_tuple = sys.argv[2]
+except:
+    max_n_tuple = 5
+    print('\n\n')
+    print('–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– ')
+    print('No max fussy set number was entered. ')
+    print('The system will run with the default value of max 5 fussy set ')
+    print('–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– ')
+    print('\n\n')
 
 
 def readFile():
@@ -124,7 +133,7 @@ class Fuzzy_set:
                 self.title_dict.append(dic[key_dic])
         return self.title_dict
 
-    def get_tuples(self, dic, title, max_n_tuple=5):
+    def get_tuples(self, dic, title, max_n_tuple):
         keytitle = 'Title_'
         self.tuple_dict = []
         count = 0
@@ -194,7 +203,6 @@ class Fuzzy_set:
         return self.membership_results
 
     def fuzzification(self):
-        # print(_mem_res)
         _rules_parser = rule_set_parser()
         _fparser = fuzzy_set_parser()
         _fset = Fuzzy_set()
@@ -245,73 +253,6 @@ class Fuzzy_set:
         # return self.value_conclusion
         return conclusions_list
 
-    def defuzzification(self, val_conclusion, _area):
-        """
-        Defuzzification using centroid (`center of gravity`) method.
-        Parameters
-        ----------
-        x : 1d array, length M
-            Independent variable
-        mfx : 1d array, length M
-            Fuzzy membership function
-        Returns
-        -------
-        u : 1d array, length M
-            Defuzzified result
-        See also
-        --------
-        skfuzzy.defuzzify.defuzz, skfuzzy.defuzzify.dcentroid
-        """
-
-        '''
-        As we suppose linearity between each pair of points of x, we can calculate
-        the exact area of the figure (a triangle or a rectangle).
-        '''
-        temp = []
-        mfx = [0.6]
-        # for _i in val_conclusion:
-
-        #     temp = [val_conclusion[_i].get('result')]
-        #     mfx.append(temp)
-
-        # print('>> ADS', mfx)
-
-        sum_moment_area = 0.0
-        sum_area = 0.0
-
-        # If the membership function is a singleton fuzzy set:
-        if len(_area) == 1:
-            return _area[0]*mfx[0] / np.fmax(mfx[0], np.finfo(float).eps).astype(float)
-
-        # else return the sum of moment*area/sum of area
-        for i in range(1, len(_area)):
-            x1 = _area[i - 1]
-            x2 = _area[i]
-            y1 = mfx[i - 1]
-            y2 = mfx[i]
-
-            # if y1 == y2 == 0.0 or x1==x2: --> rectangle of zero height or width
-            if not(y1 == y2 == 0.0 or x1 == x2):
-                if y1 == y2:  # rectangle
-                    moment = 0.5 * (x1 + x2)
-                    _area = (x2 - x1) * y1
-                elif y1 == 0.0 and y2 != 0.0:  # triangle, height y2
-                    moment = 2.0 / 3.0 * (x2-x1) + x1
-                    _area = 0.5 * (x2 - x1) * y2
-                elif y2 == 0.0 and y1 != 0.0:  # triangle, height y1
-                    moment = 1.0 / 3.0 * (x2 - x1) + x1
-                    _area = 0.5 * (x2 - x1) * y1
-                else:
-                    moment = (2.0 / 3.0 * (x2-x1) *
-                              (y2 + 0.5*y1)) / (y1+y2) + x1
-                    _area = 0.5 * (x2 - x1) * (y1 + y2)
-
-                sum_moment_area += moment * _area
-                sum_area += _area
-
-        return sum_moment_area / np.fmax(sum_area,
-                                         np.finfo(float).eps).astype(float)
-
     def defuzzy(self, _conclusions):
 
         _area_list = []
@@ -325,11 +266,10 @@ class Fuzzy_set:
         # convert list of tuple into list of list
         _conclusions_list = [list(t) for t in tuple_new_line]
 
-        # print(_conclusions_list)
         for conclusion in range(len(_conclusions_list)):
             if(_conclusions_list[conclusion][2] > 0):
                 _current_tuple = self.get_tuples(
-                    fuzzy_set_parser(), _conclusions_list[conclusion][0])
+                    fuzzy_set_parser(), _conclusions_list[conclusion][0], int(max_n_tuple))
                 for _tuple_ in _current_tuple:
                     if(_tuple_[0] == _conclusions_list[conclusion][1]):
                         _tuple_conclusion = _tuple_
@@ -338,16 +278,10 @@ class Fuzzy_set:
                         _beta = int(_tuple_[2]) + int(_tuple_[4])
                         _upper_base = int(_tuple_[2]) - int(_tuple_[1])
                         _lower_base = _beta - _alpha
+                        _conclusion_value = round(float(
+                            _conclusions_list[conclusion][2]), 3)
 
-                        _conclusion_value = float(
-                            _conclusions_list[conclusion][2])
-
-                        print("ALPHA, ", _alpha)
-                        print("BETA, ", _beta)
-                        print('upper_base:', _upper_base)
-                        print('lower_base:', _lower_base)
-
-                        _area = round((0.5 * float(_conclusion_value) *
+                        _area = round((0.5 * _conclusion_value *
                                        (_lower_base+(_lower_base*(1-_conclusion_value)))), 3)
 
                         if (int(_tuple_[1])) == (int(_tuple_[2])):
@@ -364,122 +298,27 @@ class Fuzzy_set:
                         _area_centre = (_area * _centroid)
                         _area_centre_list.append(_area_centre)
 
+                        print('\n')
+                        print(
+                            '---------------------BEGIN---**--TABLE--------------------')
+                        print("ALPHA, ", _alpha)
+                        print("BETA, ", _beta)
+                        print('upper_base:', _upper_base)
+                        print('lower_base:', _lower_base)
                         print('Centroid: ', _centroid)
 
                         print(
                             '--------------------------------------------------------')
-                        print("Area: ", _area, 'Area centre:', _area_centre, 'for', _conclusion_value,
-                              'and', _conclusions_list[conclusion][1])
+                        print("Area: ", _area, 'Area centre:', _area_centre, 'for membership value of', _conclusion_value,
+                              'and conclusion', _conclusions_list[conclusion][1])
+                        print(
+                            '--------------------------------------------------------')
         print(
             '--------------------------------------------------------')
         print('Defuzzified value: ', round(np.sum(
             _area_centre_list) / np.sum(_area_list), 5))
         print(
             '--------------------------------------------------------')
-
-
-def trap_membership_calc(mem_val, dic, _pos=0):
-    """
-    Trapezoidal membership function generator.
-    Parameters
-    ----------
-    x : 1d array
-        Independent variable.
-    abcd : 1d array, length 4
-        Four-element vector.  Ensure a <= b <= c <= d.
-    Returns
-    -------
-    y : 1d array
-        Trapezoidal membership function.
-    """
-
-    _fs = Fuzzy_set()
-    maxLength = max(map(len, dic))
-
-    tuple_values = []
-    val_list = []
-
-    # abcd = [30, 50, 50, 70]
-
-    for s in range((maxLength)):
-        tuple_values.append(dic[_pos][s])
-
-    # print('> ', tuple_values)
-    # print('abdcd', abcd[0][1])
-    # for i in dic:
-    # print('i    >  ', i)
-    # # abcd.append(i[0])
-    # print('abscs > ', abcd)
-
-    abcd = [_fs.get_alpha(dic, _pos), int(tuple_values[1]),
-            int(tuple_values[2]), _fs.get_beta(dic, _pos)]
-    print('abcd >> > ', abcd)
-    assert len(abcd) == 4, 'abcd parameter must have exactly four elements.'
-    _alpha, _a, _b, _beta = np.r_[abcd]
-    a_x = [mem_val]
-    x = np.array(a_x)
-    # print('??', _alpha, _a, _b, _beta)
-    assert _alpha <= _a and _a <= _b and _b <= _beta, 'abcd requires the four elements \
-                                          _alpha <= _a <= _b <= _beta.'
-    y = np.ones(len(x))
-
-    idx = np.nonzero(x <= _a)[0]
-    y[idx] = trimf(x[idx], np.r_[_alpha, _a, _a], tuple_values, mem_val)
-
-    idx = np.nonzero(x >= _b)[0]
-    print('_ <', idx)
-    y[idx] = trimf(x[idx], np.r_[_b, _b, _beta], tuple_values, mem_val)
-
-    idx = np.nonzero(x < _alpha)[0]
-    y[idx] = np.zeros(len(idx))
-
-    idx = np.nonzero(x > _beta)[0]
-    y[idx] = np.zeros(len(idx))
-
-    return y
-
-
-def trimf(x, abc, _list, _mem_val):
-    """
-    Triangular membership function generator.
-    Parameters
-    ----------
-    x : 1d array
-        Independent variable.
-    abc : 1d array, length 3
-        Three-element vector controlling shape of triangular function.
-        Requires a <= b <= c.
-    Returns
-    -------
-    y : 1d array
-        Triangular membership function.
-    """
-    assert len(abc) == 3, 'abc parameter must have exactly three elements.'
-    a, b, c = np.r_[abc]     # Zero-indexing in Python
-    assert a <= b and b <= c, 'abc requires the three elements a <= b <= c.'
-    _ba = 9
-    y = np.zeros(len(x))
-
-    # print('abc : ,', abc)
-    # Left side
-    if a != b:
-        idx = np.nonzero(np.logical_and(a < x, x < b))[0]
-        y[idx] = (x[idx] - a) / float(b - a)
-        # y[idx] = (x[idx] - a + b) / float(b)
-        print('in a: ', (_mem_val -
-                         int(_list[1]) + int(_list[3])) / (float(_list[3])))
-
-    # Right side
-    if b != c:
-        idx = np.nonzero(np.logical_and(b < x, x < c))[0]
-        y[idx] = (c - x[idx]) / float(c - b)
-        # y[idx] = (b + c - x[idx]) / float(c)
-        print('> > > in b:',
-              (int(_list[2]) + int(_list[4]) - _mem_val) / float(_list[4]))
-
-    idx = np.nonzero(x == b)
-    y[idx] = 1
-    return y
 
 
 def runall():
@@ -494,30 +333,11 @@ def main():
     # runall()
     print('\n')
     print('–––––––––––––––––––––––––––––––-------------------–––––––––––----––––––––––––––––––––-–')
-    print('File parser and fuzzy logic for the given text file example.')
-    print('In order to run it, please run the fuzzy_logic file along with the required arguments')
-    print('e.g. $ python fuzzy_logic.py files/RuleSet_complex.txt 6 ')
+    print('| File parser and fuzzification logic file.                                            |')
+    print('| In order to run it, please run the main file along with the required arguments       |')
+    print('| e.g. $ python main.py files/RuleSet_complex.txt 6                                    |')
     print('–––––––––––––––––––––––––––––––-------------------–––––––––––----––––––––––––––––––––-–')
     print('\n')
-
-
-def gaussmf(x, mean, sigma):
-    """
-    Gaussian fuzzy membership function.
-    Parameters
-    ----------
-    x : 1d array or iterable
-        Independent variable.
-    mean : float
-        Gaussian parameter for center (mean) value.
-    sigma : float
-        Gaussian parameter for standard deviation.
-    Returns
-    -------
-    y : 1d array
-        Gaussian membership function for x.
-    """
-    return np.exp(-((x - mean)**2.) / (2 * sigma**2.))
 
 
 if __name__ == '__main__':
