@@ -5,7 +5,19 @@ import matplotlib.pyplot as plt
 from numpy.testing import assert_allclose, assert_raises
 
 
-file_set = sys.argv[1]
+file_set = 'files/RuleSet.txt'
+
+try:
+    file_set = sys.argv[1]
+except:
+    file_set = 'files/RuleSet.txt'
+    print('\n\n')
+    print('–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– ')
+    print('No max fussy set number was entered. ')
+    print('The system will run with the default value of max 5 fussy set ')
+    print('–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––– ')
+    print('\n\n')
+
 try:
     max_n_tuple = sys.argv[2]
 except:
@@ -280,6 +292,7 @@ class Fuzzy_set:
                         _lower_base = _beta - _alpha
                         _conclusion_value = round(float(
                             _conclusions_list[conclusion][2]), 3)
+                        _defuzz_val = 0
 
                         _area = round((0.5 * _conclusion_value *
                                        (_lower_base+(_lower_base*(1-_conclusion_value)))), 3)
@@ -313,12 +326,15 @@ class Fuzzy_set:
                               'and conclusion', _conclusions_list[conclusion][1])
                         print(
                             '--------------------------------------------------------')
+        _defuzz_val = round(np.sum(
+            _area_centre_list) / np.sum(_area_list), 5)
         print(
             '--------------------------------------------------------')
-        print('Defuzzified value: ', round(np.sum(
-            _area_centre_list) / np.sum(_area_list), 5))
+        print('Defuzzified value: ', _defuzz_val)
         print(
             '--------------------------------------------------------')
+
+        return _defuzz_val
 
 
 def runall():
